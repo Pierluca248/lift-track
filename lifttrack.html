@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiftTrack</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --purple:#a78bfa;
+    --purple-dark:#7c3aed;
+    --purple-bg:#2a1f4a;
+    --purple-bg2:#3a2f5a;
+    --bg:#0f0f0f;
+    --bg2:#1a1a1a;
+    --bg3:#141414;
+    --bg4:#111;
+    --border:#2a2a2a;
+    --border2:#222;
+    --border3:#333;
+    --text:#e8e8e8;
+    --text2:#888;
+    --text3:#555;
+    --text4:#444;
+    --green:#6bcf7f;
+    --green-bg:#1a2e1a;
+    --amber:#f6a623;
+    --red:#f09595;
+    --red-bg:#3a1a1a;
+  }
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:15px;}
+  
+  .app{display:flex;flex-direction:column;min-height:100vh;max-width:760px;margin:0 auto;}
+  
+  .topbar{background:var(--bg2);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:100;}
+  .logo{font-size:17px;font-weight:600;color:var(--text);letter-spacing:0.5px;}
+  .logo span{color:var(--purple);}
+  
+  .nav{display:flex;gap:4px;flex-wrap:wrap;}
+  .nav button{background:none;border:none;color:var(--text3);font-size:13px;padding:6px 12px;border-radius:6px;cursor:pointer;font-family:inherit;transition:color 0.15s,background 0.15s;}
+  .nav button.active{background:var(--border);color:var(--text);}
+  .nav button:hover:not(.active){color:#ccc;}
+  
+  .content{padding:18px;flex:1;}
+  .section{display:none;}
+  .section.active{display:block;}
+  
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+  @media(max-width:500px){.grid4{grid-template-columns:repeat(2,1fr);}}
+  
+  .stat{background:var(--bg2);border-radius:8px;padding:12px;border:0.5px solid var(--border);}
+  .stat .lbl{font-size:11px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+  .stat .val{font-size:20px;font-weight:600;color:var(--text);}
+  .stat .val small{font-size:12px;color:var(--text2);font-weight:400;}
+  
+  .card{background:var(--bg2);border-radius:8px;padding:16px;border:0.5px solid var(--border);margin-bottom:12px;}
+  .card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .card-title{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;}
+  
+  .btn-sm{background:var(--purple-bg);color:var(--purple);border:none;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;}
+  .btn-sm:hover{background:var(--purple-bg2);}
+  .btn-primary{background:var(--purple);color:#fff;border:none;border-radius:6px;padding:10px 18px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;width:100%;transition:background 0.15s;}
+  .btn-primary:hover{background:var(--purple-dark);}
+  .btn-danger{background:var(--red-bg);color:var(--red);border:none;border-radius:6px;padding:5px 9px;font-size:13px;cursor:pointer;font-family:inherit;}
+  .btn-danger:hover{opacity:0.8;}
+  
+  .row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:0.5px solid var(--border2);}
+  .row:last-child{border-bottom:none;}
+  .row-left{display:flex;align-items:center;gap:10px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--purple);flex-shrink:0;}
+  .dot.green{background:var(--green);}
+  .rname{font-size:14px;color:var(--text);}
+  .rsub{font-size:11px;color:var(--text3);margin-top:2px;}
+  
+  .badge{background:var(--purple-bg);color:var(--purple);font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;white-space:nowrap;}
+  .badge.green{background:var(--green-bg);color:var(--green);}
+  
+  .inp{background:var(--bg4);border:0.5px solid var(--border3);color:var(--text);border-radius:6px;padding:8px 10px;font-size:13px;width:100%;font-family:inherit;}
+  .inp:focus{outline:none;border-color:var(--purple);}
+  .sel{background:var(--bg4);border:0.5px solid var(--border3);color:var(--text);border-radius:6px;padding:8px 10px;font-size:13px;width:100%;font-family:inherit;appearance:none;}
+  .sel:focus{outline:none;border-color:var(--purple);}
+  
+  .frow{margin-bottom:10px;}
+  .flbl{font-size:11px;color:var(--text3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  @media(max-width:400px){.grid2,.grid3{grid-template-columns:1fr;}}
+  
+  .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:12px;}
+  .day{background:var(--bg3);border-radius:6px;padding:8px 4px;text-align:center;border:0.5px solid var(--border2);cursor:default;}
+  .day.done{background:var(--purple-bg);border-color:#6d5bad;}
+  .day.today{border-color:var(--purple);}
+  .day-lbl{font-size:10px;color:var(--text3);margin-bottom:3px;}
+  .day.done .day-lbl,.day.today .day-lbl{color:var(--purple);}
+  .day-ico{font-size:15px;color:var(--text4);}
+  .day.done .day-ico{color:var(--purple);}
+  
+  .session-card{background:var(--bg3);border-radius:8px;padding:12px 14px;border:0.5px solid var(--border2);margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+  .sico{width:34px;height:34px;border-radius:7px;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .sico i{color:var(--purple);font-size:17px;}
+  .sico.rest{background:#1e1e1e;}
+  .sico.rest i{color:var(--text4);}
+  .sinfo{flex:1;min-width:0;}
+  .sname{font-size:13px;color:var(--text);font-weight:500;}
+  .smeta{font-size:11px;color:var(--text3);margin-top:2px;}
+  
+  .mini-chart{display:flex;align-items:flex-end;gap:3px;height:48px;margin-top:10px;}
+  .bar{background:var(--purple-bg);border-radius:3px 3px 0 0;flex:1;min-height:4px;}
+  .bar.last{background:var(--purple);}
+  .chart-lbls{display:flex;gap:3px;margin-top:4px;}
+  .chart-lbls span{flex:1;text-align:center;font-size:10px;color:var(--text4);}
+  
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;padding:20px;}
+  .overlay.open{display:flex;}
+  .modal{background:var(--bg2);border-radius:10px;border:0.5px solid var(--border3);padding:22px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;}
+  .modal-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px;}
+  .modal-actions{display:flex;gap:8px;margin-top:16px;}
+  
+  .empty-state{text-align:center;padding:28px 0;color:var(--text4);font-size:13px;}
+  .empty-state i{font-size:28px;display:block;margin-bottom:8px;color:var(--text4);}
+  
+  .pr-up{color:var(--green);font-size:11px;}
+  .pr-eq{color:var(--text3);font-size:11px;}
+  .pr-down{color:var(--red);font-size:11px;}
+  
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--purple);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:300;opacity:0;transition:opacity 0.2s;pointer-events:none;}
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="topbar">
+    <div class="logo"><span>●</span> LiftTrack</div>
+    <div class="nav">
+      <button class="active" onclick="go('dash',this)">Dashboard</button>
+      <button onclick="go('piano',this)">Piano</button>
+      <button onclick="go('prog',this)">Progressioni</button>
+      <button onclick="go('log',this)">Log</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="dash" class="section active">
+      <div class="grid4" id="stats-grid">
+        <div class="stat"><div class="lbl">Sessioni</div><div class="val" id="s-sessioni">0 <small>/ mese</small></div></div>
+        <div class="stat"><div class="lbl">Volume totale</div><div class="val" id="s-volume">0 <small>ton</small></div></div>
+        <div class="stat"><div class="lbl">PR questa sett.</div><div class="val" id="s-pr">0 <small>nuovi</small></div></div>
+        <div class="stat"><div class="lbl">Esercizi</div><div class="val" id="s-ex">0 <small>tracciati</small></div></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Settimana corrente</div></div>
+        <div class="week-grid" id="week-grid"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Ultimi set registrati</div></div>
+        <div id="dash-recent"></div>
+      </div>
+    </div>
+
+    <!-- PIANO -->
+    <div id="piano" class="section">
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">Il tuo split settimanale</div>
+          <button class="btn-sm" onclick="openSplitModal()"><i class="ti ti-edit"></i> Modifica split</button>
+        </div>
+        <div id="split-list"></div>
+      </div>
+    </div>
+
+    <!-- PROGRESSIONI -->
+    <div id="prog" class="section">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Registra un set</div></div>
+        <div class="grid2">
+          <div class="frow">
+            <label class="flbl">Esercizio esistente</label>
+            <select class="sel" id="log-ex-sel"></select>
+          </div>
+          <div class="frow">
+            <label class="flbl">Oppure nuovo esercizio</label>
+            <input class="inp" id="log-ex-new" placeholder="es. Curl con bilanciere">
+          </div>
+        </div>
+        <div class="grid3">
+          <div class="frow"><label class="flbl">Peso (kg)</label><input class="inp" type="number" id="log-peso" placeholder="90" min="0" step="0.5"></div>
+          <div class="frow"><label class="flbl">Serie</label><input class="inp" type="number" id="log-serie" placeholder="4" min="1"></div>
+          <div class="frow"><label class="flbl">Rip.</label><input class="inp" type="number" id="log-rip" placeholder="8" min="1"></div>
+        </div>
+        <button class="btn-primary" onclick="addSet()">Registra set</button>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">Progressione</div>
+          <select class="sel" id="prog-ex-sel" style="width:auto;font-size:12px;padding:4px 8px;" onchange="renderProgChart()"></select>
+        </div>
+        <div class="mini-chart" id="prog-chart"></div>
+        <div class="chart-lbls" id="prog-lbls"></div>
+        <div id="prog-pr" style="margin-top:10px;font-size:12px;color:var(--text3);"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">Gestisci esercizi</div>
+          <button class="btn-sm" onclick="openExModal()"><i class="ti ti-plus"></i> Aggiungi</button>
+        </div>
+        <div id="ex-list"></div>
+      </div>
+    </div>
+
+    <!-- LOG -->
+    <div id="log" class="section">
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">Storico set</div>
+          <div id="log-count" style="font-size:11px;color:var(--text3);"></div>
+        </div>
+        <div id="log-list"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL SPLIT -->
+<div class="overlay" id="split-overlay">
+  <div class="modal">
+    <div class="modal-title">Configura la settimana</div>
+    <div id="split-form"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="saveSplit()">Salva</button>
+      <button class="btn-danger" style="padding:10px 16px;border-radius:6px;" onclick="closeSplitModal()">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ESERCIZIO -->
+<div class="overlay" id="ex-overlay">
+  <div class="modal">
+    <div class="modal-title">Nuovo esercizio</div>
+    <div class="frow"><label class="flbl">Nome esercizio</label><input class="inp" id="ex-name-inp" placeholder="es. Trazioni alla sbarra"></div>
+    <div class="frow">
+      <label class="flbl">Gruppo muscolare</label>
+      <select class="sel" id="ex-muscle-sel">
+        <option>Petto</option><option>Schiena</option><option>Spalle</option>
+        <option>Bicipiti</option><option>Tricipiti</option><option>Gambe</option>
+        <option>Glutei</option><option>Core</option><option>Polpacci</option><option>Generico</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="addExercise()">Aggiungi</button>
+      <button class="btn-danger" style="padding:10px 16px;border-radius:6px;" onclick="closeExModal()">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DAYS = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+const today = new Date().getDay();
+const todayIdx = today === 0 ? 6 : today - 1;
+
+const DEFAULT_STATE = {
+  exercises: [
+    {id:1,name:'Panca piana',muscle:'Petto'},
+    {id:2,name:'Squat',muscle:'Gambe'},
+    {id:3,name:'Stacco da terra',muscle:'Schiena'},
+    {id:4,name:'Shoulder press',muscle:'Spalle'}
+  ],
+  split: ['Push','Pull','Riposo','Legs','Full body','Riposo','Riposo'],
+  log: [],
+  nextId: 5
+};
+
+let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('lifttrack_v2');
+    if (saved) state = JSON.parse(saved);
+  } catch(e) {}
+}
+
+function saveState() {
+  try { localStorage.setItem('lifttrack_v2', JSON.stringify(state)); } catch(e) {}
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function go(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  renderAll();
+}
+
+function renderAll() {
+  renderDash();
+  renderSplit();
+  renderExList();
+  renderExSelects();
+  renderLog();
+  renderProgChart();
+}
+
+function getDayStart(dayIdx) {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d.getTime() + (dayIdx - todayIdx) * 86400000;
+}
+
+function renderDash() {
+  const now = Date.now();
+  const monthAgo = now - 30 * 86400000;
+  const weekAgo = now - 7 * 86400000;
+  const monthLogs = state.log.filter(l => l.ts > monthAgo);
+  const days = new Set(monthLogs.map(l => Math.floor(l.ts / 86400000)));
+  document.getElementById('s-sessioni').innerHTML = days.size + ' <small>/ mese</small>';
+  const vol = monthLogs.reduce((a, l) => a + l.peso * l.serie * l.rip, 0);
+  document.getElementById('s-volume').innerHTML = (vol / 1000).toFixed(1) + ' <small>ton</small>';
+  document.getElementById('s-ex').innerHTML = state.exercises.length + ' <small>tracciati</small>';
+  let prs = 0;
+  state.exercises.forEach(ex => {
+    const exLogs = state.log.filter(l => l.exId === ex.id).sort((a, b) => b.ts - a.ts);
+    if (exLogs.length >= 2 && exLogs[0].ts > weekAgo && exLogs[0].peso > exLogs[1].peso) prs++;
+  });
+  document.getElementById('s-pr').innerHTML = prs + ' <small>nuovi</small>';
+
+  const wg = document.getElementById('week-grid');
+  wg.innerHTML = '';
+  DAYS.forEach((d, i) => {
+    const dayStart = getDayStart(i);
+    const dayEnd = dayStart + 86400000;
+    const hasLog = state.log.some(l => l.ts >= dayStart && l.ts < dayEnd);
+    const isRest = state.split[i] === 'Riposo';
+    const div = document.createElement('div');
+    div.className = 'day' + (hasLog ? ' done' : '') + (i === todayIdx ? ' today' : '');
+    div.innerHTML = `<div class="day-lbl">${d}</div><div class="day-ico"><i class="ti ${isRest ? 'ti-zzz' : 'ti-barbell'}"></i></div>`;
+    wg.appendChild(div);
+  });
+
+  const recent = state.log.slice().sort((a, b) => b.ts - a.ts).slice(0, 5);
+  const dr = document.getElementById('dash-recent');
+  if (!recent.length) {
+    dr.innerHTML = '<div class="empty-state"><i class="ti ti-clipboard-list"></i>Nessun set ancora registrato</div>';
+    return;
+  }
+  dr.innerHTML = recent.map(l => {
+    const age = Math.floor((Date.now() - l.ts) / 86400000);
+    const ageStr = age === 0 ? 'oggi' : age === 1 ? 'ieri' : age + ' gg fa';
+    return `<div class="row"><div class="row-left"><div class="dot"></div><div><div class="rname">${l.exName}</div><div class="rsub">${ageStr} · ${l.serie}×${l.rip} · ${l.muscle}</div></div></div><div class="badge">${l.peso} kg</div></div>`;
+  }).join('');
+}
+
+function renderSplit() {
+  document.getElementById('split-list').innerHTML = state.split.map((s, i) => {
+    const isRest = s === 'Riposo';
+    const isToday = i === todayIdx;
+    return `<div class="session-card">
+      <div class="sico${isRest ? ' rest' : ''}"><i class="ti ${isRest ? 'ti-zzz' : 'ti-barbell'}"></i></div>
+      <div class="sinfo">
+        <div class="sname">${DAYS[i]}${isToday ? ' <span style="color:var(--purple);font-size:11px;font-weight:400;">· oggi</span>' : ''}</div>
+        <div class="smeta">${s}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openSplitModal() {
+  document.getElementById('split-form').innerHTML = state.split.map((s, i) =>
+    `<div class="frow"><label class="flbl">${DAYS[i]}</label><input class="inp" id="sp-${i}" value="${s}" placeholder="es. Push, Riposo..."></div>`
+  ).join('');
+  document.getElementById('split-overlay').classList.add('open');
+}
+function closeSplitModal() { document.getElementById('split-overlay').classList.remove('open'); }
+function saveSplit() {
+  state.split = DAYS.map((_, i) => document.getElementById('sp-' + i).value.trim() || 'Riposo');
+  closeSplitModal(); saveState(); renderSplit(); showToast('Split salvato!');
+}
+
+function renderExList() {
+  const el = document.getElementById('ex-list');
+  if (!state.exercises.length) {
+    el.innerHTML = '<div class="empty-state"><i class="ti ti-dumbbell"></i>Nessun esercizio. Aggiungine uno!</div>';
+    return;
+  }
+  el.innerHTML = state.exercises.map(ex =>
+    `<div class="row">
+      <div class="row-left"><div class="dot"></div><div><div class="rname">${ex.name}</div><div class="rsub">${ex.muscle}</div></div></div>
+      <button class="btn-danger" onclick="deleteEx(${ex.id})"><i class="ti ti-trash"></i></button>
+    </div>`
+  ).join('');
+}
+
+function renderExSelects() {
+  const opts = state.exercises.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+  document.getElementById('log-ex-sel').innerHTML = '<option value="">— seleziona —</option>' + opts;
+  const ps = document.getElementById('prog-ex-sel');
+  ps.innerHTML = opts;
+}
+
+function openExModal() { document.getElementById('ex-overlay').classList.add('open'); }
+function closeExModal() { document.getElementById('ex-overlay').classList.remove('open'); }
+
+function addExercise() {
+  const name = document.getElementById('ex-name-inp').value.trim();
+  if (!name) return;
+  const muscle = document.getElementById('ex-muscle-sel').value;
+  state.exercises.push({ id: state.nextId++, name, muscle });
+  document.getElementById('ex-name-inp').value = '';
+  closeExModal(); saveState(); renderAll(); showToast('Esercizio aggiunto!');
+}
+
+function deleteEx(id) {
+  if (!confirm('Eliminare questo esercizio e tutti i suoi set?')) return;
+  state.exercises = state.exercises.filter(e => e.id !== id);
+  state.log = state.log.filter(l => l.exId !== id);
+  saveState(); renderAll(); showToast('Esercizio eliminato');
+}
+
+function addSet() {
+  const selId = parseInt(document.getElementById('log-ex-sel').value);
+  const newName = document.getElementById('log-ex-new').value.trim();
+  const peso = parseFloat(document.getElementById('log-peso').value);
+  const serie = parseInt(document.getElementById('log-serie').value);
+  const rip = parseInt(document.getElementById('log-rip').value);
+  if (isNaN(peso) || isNaN(serie) || isNaN(rip)) { showToast('Compila peso, serie e rip.'); return; }
+
+  let exId, exName, muscle;
+  if (newName) {
+    exId = state.nextId++;
+    exName = newName;
+    muscle = 'Generico';
+    state.exercises.push({ id: exId, name: exName, muscle });
+  } else if (selId) {
+    const ex = state.exercises.find(e => e.id === selId);
+    if (!ex) return;
+    exId = ex.id; exName = ex.name; muscle = ex.muscle;
+  } else { showToast('Seleziona o inserisci un esercizio'); return; }
+
+  state.log.push({ id: state.nextId++, exId, exName, muscle, peso, serie, rip, ts: Date.now() });
+  document.getElementById('log-ex-new').value = '';
+  document.getElementById('log-peso').value = '';
+  document.getElementById('log-serie').value = '';
+  document.getElementById('log-rip').value = '';
+  saveState(); renderAll();
+  showToast('Set registrato!');
+  go('log', document.querySelectorAll('.nav button')[3]);
+}
+
+function renderLog() {
+  const sorted = state.log.slice().sort((a, b) => b.ts - a.ts);
+  document.getElementById('log-count').textContent = sorted.length + ' set totali';
+  const el = document.getElementById('log-list');
+  if (!sorted.length) {
+    el.innerHTML = '<div class="empty-state"><i class="ti ti-clipboard-list"></i>Nessun set ancora. Vai su Progressioni!</div>';
+    return;
+  }
+  el.innerHTML = sorted.map(l => {
+    const age = Math.floor((Date.now() - l.ts) / 86400000);
+    const ageStr = age === 0 ? 'oggi' : age === 1 ? 'ieri' : age + ' gg fa';
+    const prev = state.log.filter(x => x.exId === l.exId && x.ts < l.ts).sort((a, b) => b.ts - a.ts)[0];
+    const delta = prev ? l.peso - prev.peso : null;
+    const deltaHtml = delta === null ? '' :
+      delta > 0 ? `<div class="pr-up">▲ +${delta.toFixed(1)} kg</div>` :
+      delta === 0 ? `<div class="pr-eq">= stesso peso</div>` :
+      `<div class="pr-down">▼ ${Math.abs(delta).toFixed(1)} kg</div>`;
+    return `<div class="row">
+      <div class="row-left"><div class="dot"></div><div><div class="rname">${l.exName}</div><div class="rsub">${ageStr} · ${l.serie}×${l.rip} · ${l.muscle}</div></div></div>
+      <div style="text-align:right;"><div class="badge">${l.peso} kg</div>${deltaHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderProgChart() {
+  const sel = document.getElementById('prog-ex-sel');
+  if (!sel || !sel.value) return;
+  const exId = parseInt(sel.value);
+  const logs = state.log.filter(l => l.exId === exId).sort((a, b) => a.ts - b.ts);
+  const chart = document.getElementById('prog-chart');
+  const lbls = document.getElementById('prog-lbls');
+  const prEl = document.getElementById('prog-pr');
+  if (!logs.length) {
+    chart.innerHTML = '<div style="color:var(--text4);font-size:12px;">Nessun dato ancora.</div>';
+    lbls.innerHTML = ''; prEl.innerHTML = ''; return;
+  }
+  const show = logs.slice(-8);
+  const maxP = Math.max(...show.map(l => l.peso));
+  chart.innerHTML = show.map((l, i) => {
+    const h = Math.round((l.peso / maxP) * 100);
+    return `<div class="bar${i === show.length - 1 ? ' last' : ''}" style="height:${h}%;" title="${l.peso}kg"></div>`;
+  }).join('');
+  lbls.innerHTML = show.map((l, i) => {
+    const age = Math.floor((Date.now() - l.ts) / 86400000);
+    const s = i === show.length - 1 ? `<b>${l.peso}</b>` : age === 0 ? 'oggi' : age + 'gg';
+    return `<span>${s}</span>`;
+  }).join('');
+  if (logs.length >= 2) {
+    const first = logs[0].peso, last = logs[logs.length - 1].peso;
+    const diff = (last - first).toFixed(1);
+    prEl.innerHTML = `PR: <strong style="color:var(--purple);">${last} kg</strong> · progressione totale: <span style="color:${diff >= 0 ? 'var(--green)' : 'var(--red)'}">${diff >= 0 ? '+' : ''}${diff} kg</span>`;
+  } else { prEl.innerHTML = ''; }
+}
+
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+loadState();
+renderAll();
+</script>
+</body>
+</html>
